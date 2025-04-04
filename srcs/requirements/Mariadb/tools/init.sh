@@ -1,5 +1,24 @@
 #!/bin/sh
 
+# Lire les secrets
+if [ -f "/run/secrets/db_root_password" ]; then
+    ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+else
+    echo "Erreur: Fichier db_root_password non trouvé"
+    exit 1
+fi
+
+if [ -f "/run/secrets/db_password" ]; then
+    WP_DB_PASSWORD=$(cat /run/secrets/db_password)
+else
+    echo "Erreur: Fichier db_password non trouvé"
+    exit 1
+fi
+
+# Définir les autres variables
+WP_DB_USER="wordpress"
+WP_DB_NAME="wordpress"
+
 # Créer le répertoire pour le socket MySQL et définir les permissions
 mkdir -p /var/run/mysqld
 chown -R mysql:mysql /var/run/mysqld

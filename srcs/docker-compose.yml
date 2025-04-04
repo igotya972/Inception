@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mariadb:
+    build: ./requirements/Mariadb
+    container_name: mariadb
+    restart: unless-stopped      
+    secrets:
+      - db_root_password
+      - db_password
+    expose:
+      - "3306"
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    networks:
+      - inception_network
+    env_file: .env
+
+volumes:
+  mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/vboxuser/data/mariadb
+      o: bind
+
+networks:
+  inception_network:
+    driver: bridge
+
+secrets:
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_password:
+    file: ../secrets/db_password.txt
+
+    

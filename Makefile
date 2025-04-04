@@ -1,58 +1,55 @@
 # Variables
-NGINX_IMAGE_NAME = nginx-tls
-NGINX_CONTAINER_NAME = nginx-container
-DOCKERFILE_PATH = srcs/requirements/nginx/
-NGINX_CONF_PATH = srcs/requirements/nginx/conf/
+COMPOSE_FILE = srcs/docker-compose.yml
+ENV_FILE = srcs/.env
 
 # Couleurs pour les messages
 GREEN = \033[0;32m
+YELLOW = \033[0;33m
+RED = \033[0;31m
 RESET = \033[0m
 
 # Règles principales
-all: build run
+all: prepare up
 
-# Construit l'image NGINX
-build:
-	@echo "$(GREEN)Construction de l'image $(NGINX_IMAGE_NAME)...$(RESET)"
-	docker build -t $(NGINX_IMAGE_NAME) $(DOCKERFILE_PATH)
+# Prépare l'environnement
+prepare:
+	@echo "$(GREEN)Préparation de l'environnement...$(RESET)"
+	@mkdir -p $(shell grep MARIADB_VOLUME_PATH $(ENV_FILE) | cut -d '=' -f2)
+	@mkdir -p $(shell grep WORDPRESS_VOLUME_PATH $(ENV_FILE) | cut -d '=' -f2)
 
-# Lance le conteneur NGINX
-run:
-	@echo "$(GREEN)Démarrage du conteneur $(NGINX_CONTAINER_NAME)...$(RESET)"
-	-docker stop $(NGINX_CONTAINER_NAME) 2>/dev/null || true
-	-docker rm $(NGINX_CONTAINER_NAME) 2>/dev/null || true
-	docker run -d -p 443:443 --name $(NGINX_CONTAINER_NAME) $(NGINX_IMAGE_NAME)
+# Construit et démarre les services
+up:
+	@echo "$(GREEN)Construction et démarrage des services...$(RESET)"
+	@docker compose -f $(COMPOSE_FILE) up -d --build
 
-# Arrête et supprime le conteneur
-stop:
-	@echo "$(GREEN)Arrêt du conteneur $(NGINX_CONTAINER_NAME)...$(RESET)"
-	-docker stop $(NGINX_CONTAINER_NAME)
-	-docker rm $(NGINX_CONTAINER_NAME)
+# Arrête les services
+down:
+	@echo "$(YELLOW)Arrêt des services...$(RESET)"
+	@docker compose -f $(COMPOSE_FILE) down
 
-# Supprime le conteneur et l'image
-clean: stop
-	@echo "$(GREEN)Suppression de l'image $(NGINX_IMAGE_NAME)...$(RESET)"
-	-docker rmi $(NGINX_IMAGE_NAME)
+# Arrête et supprime les volumes
+clean: down
+	@echo "$(YELLOW)Suppression des volumes...$(RESET)"
+	@docker compose -f $(COMPOSE_FILE) down -v
 
-# Redémarre le conteneur
-restart: stop run
+# Supprime tout, y compris les images
+fclean: clean
+	@echo "$(RED)Suppression des images...$(RESET)"
+	@docker system prune -af
 
-# Affiche les logs du conteneur
+# Redémarre les services
+restart: down up
+
+# Affiche les logs
 logs:
-	docker logs -f $(NGINX_CONTAINER_NAME)
-
-# Accède au shell du conteneur
-shell:
-	docker exec -it $(NGINX_CONTAINER_NAME) /bin/sh
+	@docker compose -f $(COMPOSE_FILE) logs -f
 
 # Règle pour reconstruire complètement
-re: clean all
+re: fclean all
 
-# Règle pour afficher l'état
+# Règle pour afficher l'état des services
 status:
-	@echo "$(GREEN)Images Docker:$(RESET)"
-	docker images | grep $(NGINX_IMAGE_NAME) || echo "Aucune image $(NGINX_IMAGE_NAME) trouvée"
-	@echo "\n$(GREEN)Conteneurs en cours d'exécution:$(RESET)"
-	docker ps | grep $(NGINX_CONTAINER_NAME) || echo "Aucun conteneur $(NGINX_CONTAINER_NAME) en cours d'exécution"
+	@echo "$(GREEN)Services en cours d'exécution:$(RESET)"
+	@docker compose -f $(COMPOSE_FILE) ps
 
-.PHONY: all build run stop clean restart logs shell re status
+.PHONY: all prepare up down clean fclean restart logs re status
