@@ -1,15 +1,21 @@
-version: '3.8'
-
 services:
   mariadb:
-    build: ./requirements/Mariadb
+    build: 
+      context: ./requirements/Mariadb
+      dockerfile: Dockerfile
     container_name: mariadb
+    env_file: 
+      - .env
     restart: unless-stopped      
     secrets:
       - db_root_password
       - db_password
     expose:
       - "3306"
+    networks:
+      - inception_network    # Ajout du réseau
+    volumes:
+      - mariadb:/var/lib/mysql  # Ajout du volume
   nginx:
     build: ./requirements/nginx
     container_name: nginx
