@@ -10,8 +10,6 @@ services:
     secrets:
       - db_root_password
       - db_password
-    expose:
-      - "3306"
     networks:
       - inception_network
     volumes:

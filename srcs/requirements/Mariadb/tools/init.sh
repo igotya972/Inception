@@ -1,17 +1,22 @@
 #!/bin/sh
 
-# Initialiser les tables système si necessaire
+chown -R mysql:mysql /var/lib/mysql
+chmod -R 750 /var/lib/mysql
+chmod 755 /run/mysqld
+
+DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+DB_PASSWORD=$(cat /run/secrets/db_password)
+
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
 fi
 
-# Créer un fichier de configuration temporaire
 cat > /tmp/init.sql << EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 EOF
 
-# Démarrer MariaDB avec des options d'initialisation
 exec mysqld --user=mysql --init-file=/tmp/init.sql

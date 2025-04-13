@@ -5,32 +5,25 @@ RUN apk update && apk add --no-cache \
     php81-fpm \
     php81-mysqli \
     php81-json \
-    php81-curl \
-    php81-fileinfo \
     php81-openssl \
-    php81-xml \
-    php81-zip \
+    php81-mbstring \
+    php81-session \
     php81-phar \
+    php81-iconv \
     curl \
-    mariadb-client
-
-# PHP-FPM config
-RUN mkdir -p /run/php
-COPY conf/www.conf /etc/php81/php-fpm.d/www.conf
-
-# WP-CLI installation
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    mariadb-client && \
+    mkdir -p /run/php /var/www/html /var/log/php81 && \
+    chmod 750 /var/log/php81 && \
+    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
-    mv wp-cli.phar /usr/local/bin/wp
+    mv wp-cli.phar /usr/local/bin/wp && \
+    echo "memory_limit = 512M" > /etc/php81/conf.d/memory.ini
 
-# WordPress directory
-RUN mkdir -p /var/www/html
-WORKDIR /var/www/html
-
-# Installation script
+COPY conf/www.conf /etc/php81/php-fpm.d/www.conf
 COPY tools/wp-setup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/wp-setup.sh
 
+WORKDIR /var/www/html
 EXPOSE 9000
 
 CMD ["/usr/local/bin/wp-setup.sh"] 
