@@ -6,9 +6,6 @@ while ! mariadb -h$MYSQL_HOSTNAME -u$MYSQL_USER -p$MYSQL_PASSWORD -e "SELECT 1;"
     sleep 3
 done
 
-# Créer un lien symbolique pour php
-ln -sf /usr/bin/php81 /usr/bin/php
-
 # Augmenter la limite de mémoire PHP
 echo "memory_limit = 256M" > /etc/php81/conf.d/memory.ini
 

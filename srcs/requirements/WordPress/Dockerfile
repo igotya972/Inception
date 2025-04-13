@@ -6,10 +6,7 @@ RUN apk update && apk add --no-cache \
     php81-mysqli \
     php81-json \
     php81-curl \
-    php81-dom \
-    php81-exif \
     php81-fileinfo \
-    php81-mbstring \
     php81-openssl \
     php81-xml \
     php81-zip \
