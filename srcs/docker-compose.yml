@@ -13,9 +13,9 @@ services:
     expose:
       - "3306"
     networks:
-      - inception_network    # Ajout du réseau
+      - inception_network
     volumes:
-      - mariadb:/var/lib/mysql  # Ajout du volume
+      - mariadb:/var/lib/mysql
   nginx:
     build: ./requirements/nginx
     container_name: nginx
@@ -25,13 +25,36 @@ services:
     networks:
       - inception_network
     env_file: .env
+    volumes:
+      - wordpress:/var/www/html
+    depends_on:
+      - wordpress
+  wordpress:
+    build: ./requirements/WordPress
+    container_name: wordpress
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - inception_network
+    volumes:
+      - wordpress:/var/www/html
+    depends_on:
+      - mariadb
+    expose:
+      - "9000"
 
 volumes:
   mariadb:
     driver: local
     driver_opts:
       type: none
-      device: /home/vboxuser/data/mariadb
+      device: /home/dferjul/data/mariadb
+      o: bind
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/dferjul/data/wordpress
       o: bind
 
 networks:

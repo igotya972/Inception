@@ -1,27 +1,17 @@
 #!/bin/sh
 
-# Toujours initialiser les tables système
-mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
+# Initialiser les tables système si necessaire
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+fi
 
-# Vérifier si l'initialisation a déjà été faite
-if [ ! -f "/var/lib/mysql/.initialized" ]; then
-    # Démarrage temporaire pour configuration
-    mysqld --datadir=/var/lib/mysql --skip-networking --user=mysql &
-    until mysqladmin ping --socket=/run/mysqld/mysqld.sock --silent; do sleep 1; done
-
-    # Configuration
-    mysql --protocol=socket --socket=/run/mysqld/mysqld.sock << EOF
-CREATE DATABASE wordpress;
-CREATE USER 'wordpress'@'%' IDENTIFIED BY 'dam';
-GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'%';
-ALTER USER 'root'@'localhost' IDENTIFIED BY '$(cat /run/secrets/db_root_password)';
+# Créer un fichier de configuration temporaire
+cat > /tmp/init.sql << EOF
+CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 EOF
 
-    mysqladmin --socket=/run/mysqld/mysqld.sock shutdown
-    # Marquer comme initialisé
-    touch /var/lib/mysql/.initialized
-fi
-
-# Démarrage final
-exec mysqld --user=mysql
+# Démarrer MariaDB avec des options d'initialisation
+exec mysqld --user=mysql --init-file=/tmp/init.sql
