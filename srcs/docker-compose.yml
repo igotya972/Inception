@@ -32,6 +32,9 @@ services:
     container_name: wordpress
     restart: unless-stopped
     env_file: .env
+    secrets:
+      - db_password
+      - credentials
     networks:
       - inception_network
     volumes:
@@ -40,20 +43,23 @@ services:
       - mariadb
     expose:
       - "9000"
+  adminer:
+    build: ./requirements/bonus/adminer
+    container_name: adminer
+    restart: unless-stopped
+    networks:
+      - inception_network
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
 
 volumes:
   mariadb:
     driver: local
-    driver_opts:
-      type: none
-      device: /home/dferjul/data/mariadb
-      o: bind
+
   wordpress:
     driver: local
-    driver_opts:
-      type: none
-      device: /home/dferjul/data/wordpress
-      o: bind
 
 networks:
   inception_network:
@@ -64,5 +70,7 @@ secrets:
     file: ../secrets/db_root_password.txt
   db_password:
     file: ../secrets/db_password.txt
+  credentials:
+    file: ../secrets/credentials.txt
 
     

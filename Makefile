@@ -1,7 +1,7 @@
 COMPOSE_FILE = srcs/docker-compose.yml
 ENV_FILE = srcs/.env
-VOL_WWW = /home/dferjul/data/wordpress
-VOL_DB = /home/dferjul/data/mariadb
+VOL_WWW = $(HOME)/data/wordpress
+VOL_DB = $(HOME)/data/mariadb
 
 GREEN = \033[0;32m
 YELLOW = \033[0;33m
@@ -13,8 +13,8 @@ all: prepare up
 prepare:
 	@echo "$(GREEN)Préparation des volumes...$(RESET)"
 	@mkdir -p $(VOL_DB) $(VOL_WWW)
-	@sudo chmod 755 $(VOL_WWW)
-	@sudo chmod 750 $(VOL_DB)
+	@chmod 755 $(VOL_WWW)
+	@chmod 755 $(VOL_DB)
 
 up:
 	@echo "$(GREEN)Construction et démarrage...$(RESET)"
@@ -28,7 +28,9 @@ clean: down
 
 fclean: clean
 	@docker system prune -af
-	@sudo rm -rf $(VOL_DB) $(VOL_WWW)
+	@echo "$(YELLOW)Suppression des volumes avec sudo...$(RESET)"
+	@rm -rf $(VOL_DB) $(VOL_WWW)
+	# @docker volume rm -f $$(docker volume ls -q) 2>/dev/null || true
 
 restart: down up
 
@@ -49,4 +51,7 @@ mariadb:
 wordpress:
 	@docker compose -f $(COMPOSE_FILE) up -d --build wordpress
 
-.PHONY: all prepare up down clean fclean restart logs re status nginx mariadb wordpress
+adminer:
+	@docker compose -f $(COMPOSE_FILE) up -d --build adminer
+
+.PHONY: all prepare up down clean fclean restart logs re status nginx mariadb wordpress adminer

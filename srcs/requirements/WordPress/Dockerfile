@@ -13,7 +13,7 @@ RUN apk update && apk add --no-cache \
     curl \
     mariadb-client && \
     mkdir -p /run/php /var/www/html /var/log/php81 && \
-    chmod 750 /var/log/php81 && \
+    chmod 755 /var/log/php81 && \
     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp && \
