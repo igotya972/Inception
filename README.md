@@ -11,24 +11,18 @@ Ce projet consiste à créer une infrastructure de développement utilisant Dock
 
 Le projet suit une architecture en conteneurs avec les services suivants :
 
-- **NGINX** : Serveur web avec TLS 1.3
+- **NGINX** : Serveur web avec TLS 1.2-TLS 1.3
 - **WordPress** : CMS avec PHP-FPM
 - **MariaDB** : Base de données SQL
 - **Adminer** : Interface d'administration de base de données (bonus)
 
 Chaque service s'exécute dans son propre conteneur Docker basé sur Alpine Linux.
 
-## Prérequis
-
-- Docker 20.10+
-- Docker Compose
-- Make
-
 ## Installation et démarrage
 
 1. Cloner le dépôt
    ```bash
-   git clone <url_du_repo> Inception
+   git clone https://github.com/dferjul/Inception.git
    cd Inception
    ```
 
@@ -44,8 +38,6 @@ Chaque service s'exécute dans son propre conteneur Docker basé sur Alpine Linu
 
 ## Commandes principales
 
-Le projet utilise un Makefile pour faciliter les opérations :
-
 | Commande | Description |
 |----------|-------------|
 | `make all` | Prépare les volumes et lance les conteneurs |
@@ -57,11 +49,9 @@ Le projet utilise un Makefile pour faciliter les opérations :
 | `make logs` | Affiche les logs des conteneurs |
 | `make status` | Affiche l'état des conteneurs |
 
-## Captures d'écran et démonstration
-
 ### État des conteneurs
 
-Voici l'état des conteneurs après démarrage :
+Conteneurs après démarrage :
 
 ```
 NAMES       STATUS          PORTS
@@ -73,7 +63,12 @@ mariadb     Up 14 minutes   3306/tcp
 
 ### Bases de données
 
-Bases de données disponibles sur le serveur MariaDB :
+Pour afficher les bases de données :
+```bash
+docker exec -it mariadb mariadb -u<utilisateur> -p'<mot_de_passe>' -e "SHOW DATABASES;"
+```
+
+Résultat :
 
 ```
 +--------------------+
@@ -90,7 +85,12 @@ Bases de données disponibles sur le serveur MariaDB :
 
 ### Tables WordPress
 
-Structure de la base de données WordPress :
+Pour afficher les tables WordPress :
+```bash
+docker exec -it mariadb mariadb -u<utilisateur> -p'<mot_de_passe>' -e "USE inception; SHOW TABLES;"
+```
+
+Résultat :
 
 ```
 +-----------------------+
@@ -113,7 +113,12 @@ Structure de la base de données WordPress :
 
 ### Utilisateurs WordPress
 
-Utilisateurs créés dans WordPress :
+Pour afficher les utilisateurs WordPress :
+```bash
+docker exec -it mariadb mariadb -u<utilisateur> -p'<mot_de_passe>' -e "USE inception; SELECT * FROM wp_users;"
+```
+
+Résultat :
 
 ```
 *************************** 1. row ***************************
@@ -142,8 +147,6 @@ user_activation_key:
 
 ### Adresses IP des conteneurs
 
-Configuration réseau des conteneurs :
-
 ```
 172.18.0.2  # mariadb
 172.18.0.4  # wordpress
@@ -153,7 +156,7 @@ Configuration réseau des conteneurs :
 
 ### Volumes Docker
 
-Volumes persistants créés par Docker Compose :
+Volumes persistants :
 
 ```
 DRIVER    VOLUME NAME
@@ -221,22 +224,3 @@ Inception/
 │           └── adminer/       # Service bonus d'administration DB
 └── secrets/                   # Secrets Docker pour les mots de passe
 ```
-
-## Volumes persistants
-
-Les données sont stockées dans des volumes persistants :
-
-- `mariadb` : Stockage des données de la base MariaDB
-- `wordpress` : Stockage des fichiers WordPress
-
-## Sécurité
-
-- Utilisation de TLS 1.3 pour NGINX
-- Mots de passe gérés via Docker Secrets
-- Réseau dédié entre les conteneurs
-
-## Notes techniques
-
-- Tous les conteneurs sont basés sur Alpine Linux
-- Les services sont configurés pour redémarrer automatiquement sauf en cas d'arrêt manuel
-- L'accès à WordPress se fait exclusivement via HTTPS 
