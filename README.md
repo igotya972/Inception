@@ -7,7 +7,7 @@
 
 ## Architecture
 
-- **NGINX** : Serveur web avec TLS 1.2-TLS 1.3
+- **NGINX** : Serveur web avec TLS v1.2/v1.3
 - **WordPress** : CMS avec PHP-FPM
 - **MariaDB** : Base de données SQL
 - **Adminer** : Interface d'administration de base de données (bonus)

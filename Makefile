@@ -29,8 +29,7 @@ clean: down
 fclean: clean
 	@docker system prune -af
 	@echo "$(YELLOW)Suppression des volumes avec sudo...$(RESET)"
-	@rm -rf $(VOL_DB) $(VOL_WWW)
-	# @docker volume rm -f $$(docker volume ls -q) 2>/dev/null || true
+	@sudo rm -rf $(VOL_DB) $(VOL_WWW)
 
 restart: down up
 
