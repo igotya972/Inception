@@ -5,11 +5,7 @@
 ![MariaDB](https://img.shields.io/badge/MariaDB-10.11-orange)
 ![WordPress](https://img.shields.io/badge/WordPress-6.4-blue)
 
-Ce projet consiste à créer une infrastructure de développement utilisant Docker et docker-compose, comprenant trois services principaux (NGINX, WordPress et MariaDB) et des services bonus.
-
 ## Architecture
-
-Le projet suit une architecture en conteneurs avec les services suivants :
 
 - **NGINX** : Serveur web avec TLS 1.2-TLS 1.3
 - **WordPress** : CMS avec PHP-FPM
