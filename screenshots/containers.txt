@@ -1,5 +1,0 @@
-NAMES       STATUS          PORTS
-nginx       Up 14 minutes   0.0.0.0:443->443/tcp, [::]:443->443/tcp
-wordpress   Up 14 minutes   9000/tcp
-adminer     Up 14 minutes   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
-mariadb     Up 14 minutes   3306/tcp
