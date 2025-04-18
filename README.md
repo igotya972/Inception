@@ -13,10 +13,6 @@ Inception/
         └── bonus/
 ```
 
-## Prérequis
-- Docker
-- Docker Compose
-
 ## Commandes Makefile principales
 
 - **Tout construire et lancer** :
@@ -73,6 +69,3 @@ Inception/
   ```
   Remplace `wordpress` par le conteneur désiré.
 
-## Conseils & Astuces
-- Consultez les logs en cas d'erreur (`make logs` ou `docker-compose logs <service>`).
-- Pour réinitialiser complètement l'environnement, utilisez `make fclean`.
