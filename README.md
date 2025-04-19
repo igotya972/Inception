@@ -67,5 +67,27 @@ Inception/
   ```bash
   docker exec -it wordpress sh
   ```
-  Remplace `wordpress` par le conteneur désiré.
+# Afficher les données de la base de données
+  ```bash
+  docker exec -it mariadb mysql -u $DB_USER -p$DB_PASSWORD -e "SELECT * FROM $DB_NAME.wp_users;"
+  ```
+
+## Afficher les utilisateurs WordPress dans la base de données
+
+Pour vérifier la présence des utilisateurs WordPress créés automatiquement :
+
+```bash
+docker exec -it mariadb mysql -u root -pdamroot -D inception -e "SELECT ID, user_login, user_email FROM wp_users;"
+```
+
+Résultat :
+
+```
++----+------------+-------------------+
+| ID | user_login | user_email        |
++----+------------+-------------------+
+|  1 | dferjul    | dferjul@42nice.fr |
+|  2 | hood       | hood@42nice.fr    |
++----+------------+-------------------+
+```
 
